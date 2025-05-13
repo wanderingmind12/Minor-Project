@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Synthesis Example</title>
+</head>
+<body>
+    <h1>Speech Synthesis API Example</h1>
+    <button onclick="speakText()">Speak</button>
+    
+    <script>
+       function speakText() {
+        
+    const msg = new SpeechSynthesisUtterance(`It is often debated to what extent the origins of music will ever be understood,[23] and there are competing theories that aim to explain it.[24] Many scholars highlight a relationship between the origin of music and the origin of language, and there is disagreement surrounding whether music developed before, after, or simultaneously with language.[25] A similar source of contention surrounds whether music was the intentional result of natural selection or was a byproduct spandrel of evolution.[25] The earliest influential theory was proposed by Charles Darwin in 1871, who stated that music arose as a form of sexual selection, perhaps via mating calls.[26] Darwin's original perspective has been heavily criticized for its inconsistencies with other sexual selection methods,[27] though many scholars in the 21st century have developed and promoted the theory.[28] Other theories include that music arose to assist in organizing labor, improving long-distance communication, benefiting communication with the divine, assisting in community cohesion or as a defense to scare off predators.[29]
+
+Prehistoric music can only be theorized based on findings from paleolithic archaeology sites. The disputed Divje Babe flute, a perforated cave bear femur, is at least 40,000 years old, though there is considerable debate surrounding whether it is truly a musical instrument or an object formed by animals.[30] The earliest objects whose designations as musical instruments are widely accepted are bone flutes from the Swabian Jura, Germany, namely from the Geissenklösterle, Hohle Fels and Vogelherd caves.[31] Dated to the Aurignacian (of the Upper Paleolithic) and used by Early European modern humans, from all three caves there are eight examples, four made from the wing bones of birds and four from mammoth ivory; three of these are near complete.[31] Three flutes from the Geissenklösterle are dated as the oldest, c. 43,150–39,370 BP.[22][n 3]`);
+    msg.pitch = 1.5;   // Adjust pitch
+    msg.rate = 1;    // Slow down the speech
+    msg.volume = 0.9;  // Adjust volume
+
+    // Get and set the desired voice
+    const voices = window.speechSynthesis.getVoices();
+    msg.voice = voices.find(voice => voice.name === 'Google UK English Female');
+    
+    window.speechSynthesis.speak(msg);
+    
+}
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Controlled Speech Synthesis</title>
+    <style>
+        .speech {
+            border: 1px solid #ddd;
+            width: 300px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .speech input {
+            border: 0;
+            width: 240px;
+            display: inline-block;
+            height: 30px;
+            font-size: 14px;
+        }
+
+        .speech img {
+            float: right;
+            width: 40px;
+        }
+
+        .timer {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Speech Synthesis Example with Voice Control</h1>
+
+    <form>
+        <label for="voice">Select Voice: </label>
+        <select id="voiceSelect" class="voice-select"></select><br><br>
+
+        <label for="text">Enter text to speak: </label>
+        <div class="speech">
+            <input type="text" id="transcript" class="txt" placeholder="Say something or enter text" />
+            <img onclick="startDictation()" src="https://i.imgur.com/cHidSVu.gif" alt="Mic" />
+        </div><br><br>
+
+        <label for="pitch">Pitch: </label>
+        <input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
+        <span class="pitch-value">1</span><br><br>
+
+        <label for="rate">Rate: </label>
+        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+        <span class="rate-value">1</span><br><br>
+
+        <button type="submit" id="speakBtn">Speak</button>
+    </form>
+
+    <button id="pauseBtn">Pause</button>
+    <button id="resumeBtn">Resume</button>
+
+    <div class="timer">
+        <strong>Time to Start:</strong> <span id="startTime">0.0</span>
+    </div>
+
+    <script>
+        const synth = window.speechSynthesis;
+        const inputForm = document.querySelector("form");
+        const inputTxt = document.getElementById("transcript");
+        const voiceSelect = document.querySelector("select");
+        const pitch = document.querySelector("#pitch");
+        const rate = document.querySelector("#rate");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const resumeBtn = document.getElementById("resumeBtn");
+        const speakBtn = document.getElementById("speakBtn");
+        const startTimeDisplay = document.getElementById("startTime");
+
+        let voices = [];
+        let startTime;
+
+        function populateVoiceList() {
+            voices = synth.getVoices();
+            voiceSelect.innerHTML = '';
+            for (let i = 0; i < voices.length; i++) {
+                const option = document.createElement("option");
+                option.textContent = `${voices[i].name} (${voices[i].lang})`;
+                if (voices[i].default) option.textContent += " — DEFAULT";
+                option.setAttribute("data-lang", voices[i].lang);
+                option.setAttribute("data-name", voices[i].name);
+                voiceSelect.appendChild(option);
+            }
+        }
+
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        inputForm.onsubmit = (event) => {
+            event.preventDefault();
+            const utterThis = new SpeechSynthesisUtterance(inputTxt.value);
+            const selectedOption = voiceSelect.selectedOptions[0].getAttribute("data-name");
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].name === selectedOption) {
+                    utterThis.voice = voices[i];
+                }
+            }
+            utterThis.pitch = pitch.value;
+            utterThis.rate = rate.value;
+
+            // Record start time
+            startTime = performance.now();
+
+            // Event listener for speech start
+            utterThis.onstart = () => {
+                const elapsed = performance.now() - startTime; // Time in milliseconds
+                startTimeDisplay.textContent = `${elapsed.toFixed(3)} ms`;
+            };
+
+            synth.speak(utterThis);
+            inputTxt.blur();
+        };
+
+        pauseBtn.addEventListener('click', () => {
+            if (synth.speaking && !synth.paused) {
+                synth.pause();
+            }
+        });
+
+        resumeBtn.addEventListener('click', () => {
+            if (synth.paused) {
+                synth.resume();
+            }
+        });
+
+        // Speech Recognition for voice input
+        function startDictation() {
+            if (window.hasOwnProperty('webkitSpeechRecognition')) {
+                var recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                recognition.onresult = function (e) {
+                    document.getElementById('transcript').value = e.results[0][0].transcript;
+                    recognition.stop();
+                };
+
+                recognition.onerror = function (e) {
+                    recognition.stop();
+                };
+            }
+        }
+
+        // Voice control for buttons using speech recognition
+        function voiceControl() {
+            if (window.hasOwnProperty('webkitSpeechRecognition')) {
+                var recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                recognition.start();
+
+                recognition.onresult = function (event) {
+                    const command = event.results[0][0].transcript.toLowerCase().trim();
+                    console.log("Recognized command: ", command);
+
+                    if (command.includes('speak')) {
+                        speakBtn.click();
+                    } else if (command.includes('pause')) {
+                        pauseBtn.click();
+                    } else if (command.includes('resume')) {
+                        resumeBtn.click();
+                    }
+                };
+
+                recognition.onerror = function (e) {
+                    recognition.stop();
+                };
+            }
+        }
+
+        voiceControl(); // Start voice control for buttons
+    </script>
+</body>
+</html>

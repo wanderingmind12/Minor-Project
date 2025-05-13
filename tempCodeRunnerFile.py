@@ -1,0 +1,1 @@
+https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Images#/media/File:7.62x51_and_5.56x45_bullet_cartridges_compared_to_AA_battery.jpg

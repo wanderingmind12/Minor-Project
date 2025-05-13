@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Synthesis with Pause and Resume</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <h1>Speech Synthesis Example</h1>
+    
+    <form>
+        <label for="voice">Select Voice: </label>
+        <select id="voiceSelect" class="voice-select"></select><br><br>
+
+        <label for="text">Enter text to speak: </label>
+        <textarea class="txt" rows="4" cols="50"></textarea><br><br>
+
+        <label for="pitch">Pitch: </label>
+        <input type="range" id="pitch" min="0" max="2" step="0.1" value="1">
+        <span class="pitch-value">1</span><br><br>
+
+        <label for="rate">Rate: </label>
+        <input type="range" id="rate" min="0.5" max="2" step="0.1" value="1">
+        <span class="rate-value">1</span><br><br>
+
+        <button type="submit">Speak</button>
+    </form>
+
+    <button id="pauseBtn">Pause</button>
+    <button id="resumeBtn">Resume</button>
+
+    <script>
+        const synth = window.speechSynthesis;
+
+        const inputForm = document.querySelector("form");
+        const inputTxt = document.querySelector(".txt");
+        const voiceSelect = document.querySelector("select");
+        const pitch = document.querySelector("#pitch");
+        const pitchValue = document.querySelector(".pitch-value");
+        const rate = document.querySelector("#rate");
+        const rateValue = document.querySelector(".rate-value");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const resumeBtn = document.getElementById("resumeBtn");
+
+        let voices = [];
+
+        function populateVoiceList() {
+            voices = synth.getVoices();
+
+            for (let i = 0; i < voices.length; i++) {
+                const option = document.createElement("option");
+                option.textContent = `${voices[i].name} (${voices[i].lang})`;
+
+                if (voices[i].default) {
+                    option.textContent += " — DEFAULT";
+                }
+
+                option.setAttribute("data-lang", voices[i].lang);
+                option.setAttribute("data-name", voices[i].name);
+                voiceSelect.appendChild(option);
+            }
+        }
+
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        inputForm.onsubmit = (event) => {
+            event.preventDefault();
+
+            const utterThis = new SpeechSynthesisUtterance(inputTxt.value);
+            const selectedOption = voiceSelect.selectedOptions[0].getAttribute("data-name");
+
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].name === selectedOption) {
+                    utterThis.voice = voices[i];
+                }
+            }
+
+            utterThis.pitch = pitch.value;
+            utterThis.rate = rate.value;
+            synth.speak(utterThis);
+
+            inputTxt.blur();
+        };
+
+        // Add Pause functionality
+        pauseBtn.addEventListener('click', () => {
+            if (synth.speaking && !synth.paused) {
+                synth.pause();
+            }
+        });
+
+        // Add Resume functionality
+        resumeBtn.addEventListener('click', () => {
+            if (synth.paused) {
+                synth.resume();
+            }
+        });
+    </script>
+</body>
+</html>

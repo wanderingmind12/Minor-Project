@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech</title>
+    <!-- Load ResponsiveVoice.js in the browser -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=u8f0jxZF"></script>
+</head>
+<body>
+    <button onclick="speak()">Speak</button>
+
+    <script>
+        function speak() {
+            console.time("TTS Duration");
+            if (responsiveVoice) {
+                console.log("ResponsiveVoice is loaded.");
+                responsiveVoice.speak("Hello, this is ResponsiveVoice!");
+            } else {
+                console.error("ResponsiveVoice is not loaded.");
+            } console.timeEnd("TTS Duration");
+        }
+    </script>
+</body>
+</html>
+
+

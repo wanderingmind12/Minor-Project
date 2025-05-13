@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Synthesis Event Listener Example</title>
+</head>
+<body>
+    <h1>Speech Synthesis Example with Event Listeners</h1>
+    <button id="speak">Speak</button>
+    <button id="pause">Pause</button>
+    <button id="resume">Resume</button>
+
+    <script>
+        const msg = new SpeechSynthesisUtterance("Hello, this is a test of the speech synthesis pause and resume functionality.");
+
+        // Set up speech synthesis parameters
+        msg.pitch = 1;
+        msg.rate = 1;
+        msg.volume = 1;
+
+        // Event listener to speak the text when the 'Speak' button is clicked
+        document.getElementById('speak').addEventListener('click', () => {
+            window.speechSynthesis.speak(msg);
+        });
+
+        // Event listener to pause speech when the 'Pause' button is clicked
+        document.getElementById('pause').addEventListener('click', () => {
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                window.speechSynthesis.pause();
+            }
+        });
+
+        // Event listener to resume speech when the 'Resume' button is clicked
+        document.getElementById('resume').addEventListener('click', () => {
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+            }
+        });
+
+        // Optional: Handle speech synthesis end event
+        msg.addEventListener('end', () => {
+            console.log("Speech has ended.");
+        });
+    </script>
+</body>
+</html>
